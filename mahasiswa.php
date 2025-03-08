@@ -1,7 +1,5 @@
 <?php
-class Mahasiswa{
-    //list of property
-    
+class Mahasiswa {
     protected $nim, $nama;
 
     function setData($nim, $nama){
@@ -9,18 +7,11 @@ class Mahasiswa{
         $this->nama =$nama;
     }
 
-    function getData(){
-        $mhs  = ['nim' =>$this->nim , 'nama' =>$this->nama];
-        return $mhs;
+    public function getNim() {
+        return $this->nim;
     }
-
-    function printData($data = null){
-        if(!is_null($data)){
-            foreach($data as $key => $value){
-                echo "<h1>",$value, "</h1>";
-            }
-            echo"<br>";
-        }
+    public function getNama() {
+        return $this->nama;
     }
 }
 

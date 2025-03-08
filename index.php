@@ -1,24 +1,10 @@
 <?php
-session_start(); // Memulai sesi
-
-// Class Mahasiswa
-class Mahasiswa {
-    public $nim;
-    public $nama;
-
-    public function __construct($nim, $nama) {
-        $this->nim = $nim;
-        $this->nama = $nama;
-    }
-
-    public function getInfo() {
-        return [$this->nim, $this->nama];
-    }
-}
+include_once "mahasiswa.php"; 
+session_start(); // Pastikan session dimulai setelah class dimuat
 
 // Inisialisasi array mahasiswa di session jika belum ada
-if (!isset($_SESSION['mahasiswaList'])) {
-    $_SESSION['mahasiswaList'] = [];
+if (!isset($_SESSION['mhs-array'])) {
+    $_SESSION['mhs-array'] = [];
 }
 
 // Menambahkan mahasiswa baru
@@ -27,23 +13,24 @@ if (isset($_POST['submit'])) {
     $nama = $_POST['nama'];
 
     if (!empty($nim) && !empty($nama)) {
-        $mahasiswaBaru = new Mahasiswa($nim, $nama);
-        $_SESSION['mahasiswaList'][] = $mahasiswaBaru;
+        $mahasiswaBaru = new Mahasiswa();
+        $mahasiswaBaru->setData($nim, $nama);
+        $_SESSION['mhs-array'][] = $mahasiswaBaru; // Simpan objek langsung tanpa serialize
     }
 }
 
 // Menghapus mahasiswa berdasarkan index
 if (isset($_POST['hapus'])) {
     $index = $_POST['hapus'];
-    if (isset($_SESSION['mahasiswaList'][$index])) {
-        unset($_SESSION['mahasiswaList'][$index]);
-        $_SESSION['mahasiswaList'] = array_values($_SESSION['mahasiswaList']); // Reindex array
+    if (isset($_SESSION['mhs-array'][$index])) {
+        unset($_SESSION['mhs-array'][$index]);
+        $_SESSION['mhs-array'] = array_values($_SESSION['mhs-array']);
     }
 }
 
 // Reset semua data mahasiswa
 if (isset($_POST['reset'])) {
-    $_SESSION['mahasiswaList'] = [];
+    $_SESSION['mhs-array'] = [];
 }
 ?>
 
@@ -73,7 +60,7 @@ if (isset($_POST['reset'])) {
         </form>
 
         <!-- Tabel Menampilkan Mahasiswa -->
-        <?php if (!empty($_SESSION['mahasiswaList'])): ?>
+        <?php if (!empty($_SESSION['mhs-array'])): ?>
             <div class="mt-5 bg-light p-3 rounded w-75">
                 <h2 class="text-center">Daftar Mahasiswa</h2>
                 <table class="table table-striped">
@@ -85,13 +72,12 @@ if (isset($_POST['reset'])) {
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($_SESSION['mahasiswaList'] as $index => $mhs): ?>
-                            <?php list($nim, $nama) = $mhs->getInfo(); ?>
+                        <?php foreach ($_SESSION['mhs-array'] as $index => $mhs): ?>
                             <tr>
-                                <td><?= htmlspecialchars($nim); ?></td>
-                                <td><?= htmlspecialchars($nama); ?></td>
+                                <td><?= htmlspecialchars($mhs->getNim()); ?></td>
+                                <td><?= htmlspecialchars($mhs->getNama()); ?></td>
                                 <td>
-                                    <form method="post" style="display:inline;">
+                                    <form method="post" style="display:block;">
                                         <button type="submit" name="hapus" value="<?= $index; ?>" class="btn btn-danger btn-sm">X</button>
                                     </form>
                                 </td>
